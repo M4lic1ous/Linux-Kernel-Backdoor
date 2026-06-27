@@ -1,10 +1,9 @@
-# Linux-Kernel-Backdoor
 # 🔥 SystemD-Hidden Backdoor 🔥
 
 <div align="center">
 
 [![Version](https://img.shields.io/badge/version-2.1.0-red.svg)](https://github.com)
-[![Platform](https://img.shields.io/badge/platform-Linux-blue.svg)](https://github.com)
+[![Platform](https://img.shields.io/badge/platform-Linux-blue.svg)](https://github)
 [![License](https://img.shields.io/badge/license-EDUCATIONAL-purple.svg)](https://github)
 
 **فقط برای اهداف آموزشی و محیط‌های تست نفوذ قانونی** ⚠️
@@ -171,6 +170,39 @@ const char *SERVER_IPS[] = {
 
 ---
 
+## 🔄 معماری و نحوه عملکرد
+
+```
+مرحله 1: اجرای برنامه
+    ↓
+مرحله 2: بررسی تک‌نسخه بودن (قفل فایل)
+    ↓
+مرحله 3: مخفی‌سازی فرآیند با prctl
+    ↓
+مرحله 4: تبدیل به Daemon (Fork & Setsid)
+    ↓
+مرحله 5: ایجاد چندین Thread برای اتصال به سرورها
+    ↓
+مرحله 6: اتصال به سرور و دریافت Shell
+    ↓
+مرحله 7: تنظیم TTY و اجرای /bin/bash
+    ↓
+مرحله 8: در صورت قطع اتصال، ری‌کانکت خودکار
+```
+
+### نحوه مخفی‌سازی در سیستم:
+
+```
+1. تغییر نام به [kworker/0:0] → مخفی شدن در بین پردازه‌های کرنل
+2. کپی شدن در /usr/local/bin/.systemd-resolved → مخفی‌سازی در مسیر
+3. نصب به عنوان سرویس systemd → پایداری و اجرا در بوت
+4. آنمونت کردن /proc → مخفی‌سازی PID از دستورات سیستمی
+5. بایند مونت دایرکتوری خالی → ماسک کردن کامل فرآیند
+6. Redirect خروجی‌ها به null → عدم ثبت هیچ لاگی
+```
+
+---
+
 ## 🛡️ تکنیک‌های امنیتی استفاده شده
 
 | تکنیک | توضیح |
@@ -186,17 +218,19 @@ const char *SERVER_IPS[] = {
 
 ---
 
-## 🎓 محیط‌های تست شده
+## 🎓 سیستم‌عامل‌های سازگار
 
-| توزیع | نسخه | وضعیت |
-|-------|------|--------|
-| Kali Linux | 2023.x | ✅ کامل |
-| Ubuntu | 20.04/22.04 | ✅ کامل |
-| Debian | 10/11/12 | ✅ کامل |
-| CentOS | 7/8 | ✅ کامل |
-| Fedora | 37/38 | ✅ کامل |
-| Arch Linux | latest | ✅ کامل |
-| RHEL | 8/9 | ✅ کامل |
+| توزیع | وضعیت |
+|-------|--------|
+| Kali Linux | ✅ کامل |
+| Ubuntu | ✅ کامل |
+| Debian | ✅ کامل |
+| CentOS | ✅ کامل |
+| Fedora | ✅ کامل |
+| Arch Linux | ✅ کامل |
+| RHEL | ✅ کامل |
+| Gentoo | ✅ کامل |
+| OpenSUSE | ✅ کامل |
 
 ---
 
@@ -234,7 +268,7 @@ const char *SERVER_IPS[] = {
 
 **ساخته شده با ❤️ برای جامعه امنیت سایبری**
 
-[⭐ ستاره دهید](https://github.com) | [🐛 گزارش باگ](https://github.com) | [📧 تماس](mailto:your-email)
+[🐛 گزارش باگ](https://t.me/XCEE_H3R) | [📧 تماس](https://t.me/XCEE_H3R)
 
 </div>
 
