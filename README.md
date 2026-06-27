@@ -1,4 +1,4 @@
-# 🔥Hide-Sys-BackDoor🔥
+# 🔥Hide-Sys-BackDoor
 
 <div align="center">
 
